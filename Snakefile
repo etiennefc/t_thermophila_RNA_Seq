@@ -6,23 +6,25 @@ configfile: "config.json"
 original_id = list(config['dataset'].values())
 simple_id = list(config['dataset'].keys())
 
+include: "rules/download_all.smk"
 
 rule all:
     input:
-        qc_before_trim = expand("logs/fastqc/before_trim/{id}.log",
-            id=simple_id),
-        qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
-        coco_cc = expand('results/coco/{id}.tsv', id=simple_id)
+        #qc_before_trim = expand("logs/fastqc/before_trim/{id}.log",
+        #    id=simple_id),
+        #qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
+        #coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
+        gtf_corrected = config['path']['corrected_gtf']
 
 
 rule all_downloads:
     input:
-        samples = expand('data/references/fastq/{id}_{pair}.fastq.gz',
-            id=original_id, pair=[1, 2]),
-        reference_genome = config['path']['reference_genome'],
-        standard_gtf = config['path']['standard_annotation'],
-        reference_gtf = config['path']['reference_annotation'],
-        reference_intron_gtf = config['path']['reference_intron_annotation'],
+#        samples = expand('data/references/fastq/{id}_{pair}.fastq.gz',
+#            id=original_id, pair=[1, 2]),
+#        reference_genome = config['path']['reference_genome'],
+#        genome_gff = config['path']['genome_gff'],
+#        tRNA_gff = config['path']['tRNA_gff'],
+#        rRNA_5s_gff = config['path']['rRNA_5s_gff'],
         coco_git = 'git_repos/coco'
 
 
@@ -45,6 +47,36 @@ rule rename_samples:
                 new = "data/references/fastq/{}_R{}.fastq.gz".format(new_name, num)
                 print(old, new)
                 os.rename(old, new)
+
+
+rule generate_gtf:
+    """	Generate and assemble complete gtf from downloaded gff3 files. """
+    output:
+        gtf = config['path']['complete_gtf']
+    params:
+    	genome = config['path']['genome_gtf'],
+	tRNA = config['path']['tRNA_gtf'],
+	rRNA_5s = config['path']['5s_rRNA_gtf']
+    conda:
+    	"envs/gff_read.yaml"
+    shell:
+        "chmod u+x scripts/* && "
+        "./scripts/generate_complete_gtf.sh && "
+        "cat {params.genome} {params.tRNA} {params.rRNA_5s} > {output.gtf}"
+	
+
+rule coco_ca:
+    """ Generate corrected annotation from the assembled gtf. """
+    input:
+        gtf = rules.generate_gtf.output    
+    output:
+        gtf_corrected = config['path']['corrected_gtf']
+    params:
+        coco_ca = config['path']['coco_ca']	
+    conda:
+        "envs/coco.yaml"
+    shell:
+        "python3 {params.coco_ca} {input.gtf} -o {output.gtf_corrected}"
 
 
 rule trimming:
@@ -135,7 +167,7 @@ rule star_index:
     """Generate the genome index needed for STAR alignment"""
     input:
         fasta = config['path']['reference_genome'],
-        standard_gtf = config['path']['standard_annotation']
+        standard_gtf = config['path']['complete_gtf']
     output:
         chrNameLength = "data/star_index/chrNameLength.txt"
     threads:
@@ -195,14 +227,9 @@ rule star_align:
 
 rule coco_cc:
     """Quantify the number of counts, counts per million (CPM) and transcript
-        per million (TPM) for each gene using CoCo correct_count (cc). If you
-        want to use your own annotation file, you must implement in this
-        workflow the correct_annotation function of CoCo in order to use CoCo's
-        correct_count function. Otherwise, by default, you will use the given 
-        annotation file used in this analysis"""
+        per million (TPM) for each gene using CoCo correct_count (cc)."""
     input:
-        gtf = config['path']['reference_annotation'],
-        intron_gtf = config['path']['reference_intron_annotation'],
+        gtf = config['path']['corrected_gtf'],
         bam = rules.star_align.output.bam
     output:
         counts = Path("results/coco/", "{id}.tsv")
@@ -226,5 +253,3 @@ rule coco_cc:
         "&> {log}"
 
 
-#Include download_all rules to download necessary datasets and references
-include: "rules/download_all.smk"
