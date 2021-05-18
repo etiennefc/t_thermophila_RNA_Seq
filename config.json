@@ -1,27 +1,15 @@
 {
   "dataset":
   {
-    "Breast_1": "SRX5395643",
-    "Breast_2": "SRX5395644",
-    "Breast_3": "SRX9318421",
-    "Ovary_1": "SRX5395641",
-    "Ovary_2": "SRX5395642",
-    "Ovary_3": "SRX5395640",
-    "Prostate_1": "SRX5395645",
-    "Prostate_2": "SRX5395646",
-    "Prostate_3": "SRX5395647",
-    "Testis_1": "SRX9107955",
-    "Testis_2": "SRX9107956",
-    "Testis_3": "SRX9107957",
-    "Skeletal_muscle_1": "SRX9107958",
-    "Skeletal_muscle_2": "SRX9107959",
-    "Skeletal_muscle_3": "SRX9107960",
-    "Liver_1": "SRX9107961",
-    "Liver_2": "SRX9107962",
-    "Liver_3": "SRX9107963",
-    "Brain_1": "SRX9107964",
-    "Brain_2": "SRX9107965",
-    "Brain_3": "SRX9107966"
+    "WT_1": "wildtype_input_1_S4",
+    "WT_2": "wildtype_input_2_S5",
+    "WT_3": "wildtype_input_3_S6",
+    "KO_1": "MLP1_KO_input_1_S1",
+    "KO_2": "MLP1_KO_input_2_S2",
+    "KO_3": "MLP1_KO_input_3_S3",
+    "MLP1_IP_1": "MLP1_IPed_elution_1_S7",
+    "MLP1_IP_2": "MLP1_Iped_elution_2_S8",
+    "MLP1_IP_3": "MLP1_Iped_elution_3_S9"
   },
   "path":
   {
@@ -36,7 +24,9 @@
     "5s_rRNA_gtf": "data/references/5s_rRNA.gtf",
     "complete_gtf": "data/references/t_thermophila_complete_2021.gtf",
     "coco_ca": "git_repos/coco/bin/correct_annotation.py",
-    "corrected_gtf": "data/references/t_thermophila_complete_2021.correct_annotation.gtf"
+    "corrected_gtf": "data/references/t_thermophila_complete_2021.correct_annotation.gtf",
+    "coco_output_dir": "results/coco/",
+    "coco_merge": "results/coco_merge/"    
   },
   "download":
   {

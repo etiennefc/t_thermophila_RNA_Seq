@@ -1,0 +1,10 @@
+sample	condition
+KO_1	partial_knockout
+KO_2	partial_knockout
+KO_3    partial_knockout
+WT_1    wild_type
+WT_2    wild_type
+WT_3    wild_type
+MLP1_IP_1    MLP1_IP
+MLP1_IP_2    MLP1_IP
+MLP1_IP_3    MLP1_IP

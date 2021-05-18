@@ -7,21 +7,24 @@ original_id = list(config['dataset'].values())
 simple_id = list(config['dataset'].keys())
 
 include: "rules/download_all.smk"
+include: "rules/DESeq2.smk"
 
 rule all:
     input:
-        #qc_before_trim = expand("logs/fastqc/before_trim/{id}.log",
-        #    id=simple_id),
-        #qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
-        #coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
-        gtf_corrected = config['path']['corrected_gtf']
+        qc_before_trim = expand("logs/fastqc/before_trim/{id}.log",
+            id=simple_id),
+        qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
+        coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
+	bedgraph = expand("results/coco_bedgraph/{id}.bedgraph", id=simple_id),
+        gtf_corrected = config['path']['corrected_gtf'],
+	deseq_log = "logs/DESeq2/genes.log"
 
 
 rule all_downloads:
     input:
 #        samples = expand('data/references/fastq/{id}_{pair}.fastq.gz',
 #            id=original_id, pair=[1, 2]),
-#        reference_genome = config['path']['reference_genome'],
+        reference_genome = config['path']['reference_genome'],
 #        genome_gff = config['path']['genome_gff'],
 #        tRNA_gff = config['path']['tRNA_gff'],
 #        rRNA_5s_gff = config['path']['rRNA_5s_gff'],
@@ -34,7 +37,7 @@ rule rename_samples:
     """Rename samples with a nicer understandable name"""
     input:
         fastq = expand(
-            "data/references/fastq/{id}_{pair}.fastq.gz",
+            "data/references/fastq/{id}_R{pair}.fastq.gz",
             id=original_id, pair=[1, 2])
     output:
         renamed_fastq = expand(
@@ -43,7 +46,7 @@ rule rename_samples:
     run:
         for new_name, old_name in config['dataset'].items():
             for num in [1, 2]:
-                old = "data/references/fastq/{}_{}.fastq.gz".format(old_name, num)
+                old = "data/references/fastq/{}_R{}.fastq.gz".format(old_name, num)
                 new = "data/references/fastq/{}_R{}.fastq.gz".format(new_name, num)
                 print(old, new)
                 os.rename(old, new)
@@ -76,7 +79,8 @@ rule coco_ca:
     conda:
         "envs/coco.yaml"
     shell:
-        "python3 {params.coco_ca} {input.gtf} -o {output.gtf_corrected}"
+        #"python3 {params.coco_ca} {input.gtf} -o {output.gtf_corrected}"
+        "python3 git_repos/coco/bin/coco.py ca {input.gtf} -o {output.gtf_corrected}"
 
 
 rule trimming:
@@ -221,7 +225,8 @@ rule star_align:
         "--outFilterMatchNminOverLread 0.3 "
         "--outFilterMultimapNmax 100 "
         "--winAnchorMultimapNmax 100 "
-        "--alignEndsProtrude 5 ConcordantPair"
+        "--alignEndsProtrude 5 ConcordantPair "
+	"--limitBAMsortRAM 6802950316"
         "&> {log}"
 
 
@@ -251,5 +256,42 @@ rule coco_cc:
         "{input.bam} "
         "{output.counts} "
         "&> {log}"
+
+rule coco_cb:
+    """Generate bedgraphs of sample using CoCo correct_bedgraph (cb)."""
+    input:
+        bam = rules.star_align.output.bam
+    output:
+        bedgraph = Path("results/coco_bedgraph/", "{id}.bedgraph")
+    threads:
+        32
+    params:
+        coco_path = "git_repos/coco/bin",
+	genome_path = rules.star_index.output.chrNameLength 
+    log:
+        "logs/coco/coco_cb_{id}.log"
+    conda:
+        "envs/coco.yaml"
+    shell:
+        "python {params.coco_path}/coco.py cb "
+        "{input.bam} "
+        "{output.bedgraph} "
+	"{params.genome_path} "
+        "--thread {threads} "        
+	"&> {log}"
+
+rule merge_coco_output:
+    """ Merge CoCo correct count outputs into one count, cpm or tpm file (all
+        tissues merged inside one dataframe). This rule takes in input the
+        output result directory of CoCo within the TGIRT-Seq pipeline."""
+    output:
+        output_dir = directory(config['path']['coco_merge']),
+	counts = os.path.join(config['path']['coco_merge'], "merged_counts.tsv")
+    params:
+        input_dir = config['path']['coco_output_dir']
+    conda:
+        "envs/python.yaml"
+    script:
+        "scripts/merge_coco_cc_output.py"
 
 

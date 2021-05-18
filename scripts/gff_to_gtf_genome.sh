@@ -22,3 +22,5 @@ sed -i 's/Parent\s\("g[0-9]*";*\)/gene_id \1/g' $gtf_output_path #change Parent 
 gawk -i inplace 'BEGIN{exon_nb=0;id=""}{if (match($0, /(Parent\s"g[0-9]*.t[0-9]*")/, pattern)) {if (pattern[1]==id){exon_nb+=1} else {exon_nb=1} print $0 "; exon_number \""exon_nb"\";"; id=pattern[1]} else print $0}' $gtf_output_path #add exon_number to end of exon lines
 gawk -i inplace 'BEGIN{all_features="";id=""}{if (match($0, /(transcript_id\s"g[0-9]*.t[0-9]*"[^\n]*)/, features)) {split(features[1], pattern, " "); all_features=features[1]; id=pattern[2]}; if ($0 ~ "Parent "id){print $0,all_features} else print $0}' $gtf_output_path #add gene and transcript features to exon lines
 sed -i -E '/^#/d; s/$/;/g; s/Parent\s("g[0-9]*).t[0-9]*"/exon_id \1"; exon_version "1"/g' $gtf_output_path #remove lines starting with "#", add ';' at the end of each line, remove Parent feature in exon lines and replace it with exon_id (which is the gene_id) and exon_version
+
+sed -i -E 's/(transcript_name "g[0-9]*.t[2-9]";)/\1 gene_biotype "protein_coding";/g' $gtf_output_path  #add gene_biotype to transcripts and exons of genes containing multiple transcripts (.t2, .t3, .t4, etc.)

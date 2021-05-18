@@ -44,5 +44,11 @@
         "cpus-per-task": "32",
         "mem": "128G",
         "time": "0-6:00:00"
-    }
+    },
+    "coco_cb":
+    {
+        "cpus-per-task": "32",
+        "mem": "128G",
+        "time": "0-6:00:00"
+    }    
 }
