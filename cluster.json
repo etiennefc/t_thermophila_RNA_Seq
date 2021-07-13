@@ -39,6 +39,12 @@
         "mem": "128G",
         "time": "0-3:00:00"
     },
+    "star_align_stringent":
+    {
+        "cpus-per-task": "32",
+        "mem": "128G",
+        "time": "0-3:00:00"
+    },
     "coco_cc":
     {
         "cpus-per-task": "32",
@@ -50,5 +56,43 @@
         "cpus-per-task": "32",
         "mem": "128G",
         "time": "0-6:00:00"
-    }    
+    },
+    "coco_cb_stringent":
+    {
+        "cpus-per-task": "32",
+        "mem": "128G",
+        "time": "0-6:00:00"
+    },
+        "coco_cb_multimap_reads":
+    {
+        "cpus-per-task": "32",
+        "mem": "128G",
+        "time": "0-6:00:00"
+    },
+        "coco_cb_unique_reads":
+    {
+        "cpus-per-task": "32",
+        "mem": "128G",
+        "time": "0-6:00:00"
+    },
+    "extract_reads":
+    {
+        "job-name": "extract_reads",
+        "nodes": "1",
+        "cpus-per-task": "1",
+        "mem": "1G",
+        "time": "0-3:30:00",
+        "mail-user": "etienne.fafard-couture@usherbrooke.ca",
+        "mail-type": "FAIL"
+    },
+    "extract_reads_wo_trna_seq":
+    {
+        "job-name": "extract_reads_wo_trna_seq",
+        "nodes": "1",
+        "cpus-per-task": "1",
+        "mem": "1G",
+        "time": "0-2:30:00",
+        "mail-user": "etienne.fafard-couture@usherbrooke.ca",
+        "mail-type": "FAIL"
+    }
 }

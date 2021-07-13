@@ -18,7 +18,7 @@
     "coco_git_link": "http://gitlabscottgroup.med.usherbrooke.ca/scott-group/coco.git",
     "genome_gff": "data/references/genome.gff",
     "tRNA_gff": "data/references/tRNA.gff",
-    "rRNA_5s_gff": "data/references/5s_rRNA.gff",    
+    "rRNA_5s_gff": "data/references/5s_rRNA.gff",
     "genome_gtf": "data/references/genome.gtf",
     "tRNA_gtf": "data/references/tRNA.gtf",
     "5s_rRNA_gtf": "data/references/5s_rRNA.gtf",
@@ -26,7 +26,42 @@
     "coco_ca": "git_repos/coco/bin/correct_annotation.py",
     "corrected_gtf": "data/references/t_thermophila_complete_2021.correct_annotation.gtf",
     "coco_output_dir": "results/coco/",
-    "coco_merge": "results/coco_merge/"    
+    "coco_merge": "results/coco_merge/",
+    "tpm_df_biotype": "results/coco_merge/merged_tpm_w_biotype.tsv",
+    "deseq_output": "results/DESeq2/formated_tables/",
+    "merged_deseq_fold_change": "results/DESeq2/formated_tables/merged_fold_change_KO_IP_vs_WT.tsv",
+    "tRNA_sequences": "data/references/tRNA_sequences.fa",
+    "tRNA_sequences_id": "data/references/tRNA_sequences_w_id.fa",
+    "extract_reads": "results/extract_reads/",
+    "extract_reads_wo_trna_seq": "results/extract_reads_wo_trna_seq/",
+    "merged_reads_df": "results/extract_reads/merged_df.tsv",
+    "merged_reads_wo_trna_df": "results/extract_reads_wo_trna_seq/merged_df.tsv",
+    "mature_premature_diff": "results/extract_reads/mature_vs_premature.tsv",
+    "mature_premature_diff_wo_trna": "results/extract_reads_wo_trna_seq/mature_vs_premature.tsv"
+  },
+  "figure":
+  {
+    "pie": "results/figures/pie/",
+    "volcano": "results/figures/volcano/",
+    "scatter": "results/figures/scatter/"
+  },
+  "colors":
+  {
+    "gene_biotype":
+    {
+      " tRNA": "#1b9e77",
+      " rRNA": "#7570b3",
+      " protein_coding": "#d95f02"
+    },
+    "tpm_biotype":
+    {
+      "tRNA_expressed": "#1b9e77",
+      "tRNA_not_expressed": "#abe3d3",
+      "rRNA_expressed": "#7570b3",
+      "rRNA_not_expressed": "#bab7d9",
+      "pc_expressed": "#d95f02",
+      "pc_not_expressed": "#fdac6e"
+    }
   },
   "download":
   {

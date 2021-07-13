@@ -1,4 +1,5 @@
 import os
+from get_figures import get_figures_path
 from pathlib import Path
 
 configfile: "config.json"
@@ -8,6 +9,9 @@ simple_id = list(config['dataset'].keys())
 
 include: "rules/download_all.smk"
 include: "rules/DESeq2.smk"
+include: "rules/df_formatting.smk"
+include: "rules/figures.smk"
+include: "rules/bam_extraction.smk"
 
 rule all:
     input:
@@ -16,8 +20,20 @@ rule all:
         qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
         coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
 	bedgraph = expand("results/coco_bedgraph/{id}.bedgraph", id=simple_id),
-        gtf_corrected = config['path']['corrected_gtf'],
-	deseq_log = "logs/DESeq2/genes.log"
+	stringent_bedgraph = expand("results/coco_bedgraph_stringent/{id}.bedgraph", id=simple_id),  # bedgraph no mismatch allowed
+        unique_bedgraph = expand("results/coco_bedgraph_UNIQUE/{id}.bedgraph", id=simple_id),  # bedgraph for uniquely mapped reads
+        multi_bedgraph = expand("results/coco_bedgraph_MULTI/{id}.bedgraph", id=simple_id),  # bedgraph for multi-mapped reads
+        gtf_corrected = config['path']['corrected_gtf'],  # via coco_ca
+	deseq_log = "logs/DESeq2/genes.log",
+        tpm_df_biotype = config['path']['tpm_df_biotype'],
+        WT_vs_KO_clean = os.path.join(config['path']['deseq_output'],
+                        'partial_knockout-wild_type_v2.csv'),
+        modified_fasta = config['path']['tRNA_sequences_id'],
+        number_reads = expand(os.path.join(config['path']['extract_reads'], "{id}.txt"), id=simple_id),
+        merged_reads_df = config['path']['merged_reads_df'],
+        avg_diff_df = config['path']['mature_premature_diff'],
+        avg_diff_wo_trna_df = config['path']['mature_premature_diff_wo_trna'],
+        figures = get_figures_path(config)
 
 
 rule all_downloads:
@@ -66,16 +82,16 @@ rule generate_gtf:
         "chmod u+x scripts/* && "
         "./scripts/generate_complete_gtf.sh && "
         "cat {params.genome} {params.tRNA} {params.rRNA_5s} > {output.gtf}"
-	
+
 
 rule coco_ca:
     """ Generate corrected annotation from the assembled gtf. """
     input:
-        gtf = rules.generate_gtf.output    
+        gtf = rules.generate_gtf.output
     output:
         gtf_corrected = config['path']['corrected_gtf']
     params:
-        coco_ca = config['path']['coco_ca']	
+        coco_ca = config['path']['coco_ca']
     conda:
         "envs/coco.yaml"
     shell:
@@ -230,6 +246,46 @@ rule star_align:
         "&> {log}"
 
 
+rule star_align_stringent:
+    """Align reads to reference genome using STAR with 0 mismatch allowed"""
+    input:
+        fastq1 = rules.trimming.output.fastq1,
+        fastq2 = rules.trimming.output.fastq2,
+        idx = rules.star_index.output
+    output:
+        bam = "results/star_stringent/{id}/Aligned.sortedByCoord.out.bam"
+    threads:
+        32
+    params:
+        outdir = "results/star_stringent/{id}/",
+        index_dir = "data/star_index/"
+    log:
+        "logs/star_stringent/star_align_{id}.log"
+    conda:
+        "envs/star.yaml"
+    shell:
+        "STAR --runMode alignReads "
+        "--genomeDir {params.index_dir} "
+        "--readFilesIn {input.fastq1} {input.fastq2} "
+        "--runThreadN {threads} "
+        "--readFilesCommand zcat "
+        "--outReadsUnmapped Fastx "
+        "--outFilterType BySJout "
+        "--outStd Log "
+        "--outSAMunmapped None "
+        "--outSAMtype BAM SortedByCoordinate "
+        "--outFileNamePrefix {params.outdir} "
+        "--outFilterScoreMinOverLread 0.3 "
+        "--outFilterMatchNminOverLread 0.3 "
+        "--outFilterMultimapNmax 100 "
+        "--winAnchorMultimapNmax 100 "
+        "--alignEndsProtrude 5 ConcordantPair "
+        "--limitBAMsortRAM 6802950316"
+        "--outFilterMismatchNmax 0"
+        "&> {log}"
+
+
+
 rule coco_cc:
     """Quantify the number of counts, counts per million (CPM) and transcript
         per million (TPM) for each gene using CoCo correct_count (cc)."""
@@ -267,7 +323,7 @@ rule coco_cb:
         32
     params:
         coco_path = "git_repos/coco/bin",
-	genome_path = rules.star_index.output.chrNameLength 
+	genome_path = rules.star_index.output.chrNameLength
     log:
         "logs/coco/coco_cb_{id}.log"
     conda:
@@ -277,8 +333,82 @@ rule coco_cb:
         "{input.bam} "
         "{output.bedgraph} "
 	"{params.genome_path} "
-        "--thread {threads} "        
+        "--thread {threads} "
 	"&> {log}"
+
+
+rule coco_cb_stringent:
+    """Generate bedgraphs of sample using CoCo correct_bedgraph (cb) and stringent alignment."""
+    input:
+        bam = rules.star_align_stringent.output.bam
+    output:
+        bedgraph = Path("results/coco_bedgraph_stringent/", "{id}.bedgraph")
+    threads:
+        32
+    params:
+        coco_path = "git_repos/coco/bin",
+        genome_path = rules.star_index.output.chrNameLength
+    log:
+        "logs/coco/coco_cb_stringent_{id}.log"
+    conda:
+        "envs/coco.yaml"
+    shell:
+        "python {params.coco_path}/coco.py cb "
+        "{input.bam} "
+        "{output.bedgraph} "
+        "{params.genome_path} "
+        "--thread {threads} "
+        "&> {log}"
+
+
+rule coco_cb_unique_reads:
+    """Generate bedgraphs of sample using CoCo correct_bedgraph (cb) and uniquely mapped reads"""
+    input:
+        bam_unique = "results/star/{id}/Aligned.sortedByCoord.out.UNIQUE.bam"
+    output:
+        bedgraph = Path("results/coco_bedgraph_UNIQUE/", "{id}.bedgraph")
+    threads:
+        32
+    params:
+        coco_path = "git_repos/coco/bin",
+        genome_path = rules.star_index.output.chrNameLength
+    log:
+        "logs/coco/coco_cb_unique_{id}.log"
+    conda:
+        "envs/coco.yaml"
+    shell:
+        "python {params.coco_path}/coco.py cb "
+        "{input.bam_unique} "
+        "{output.bedgraph} "
+        "{params.genome_path} "
+        "--thread {threads} "
+        "&> {log}"
+
+
+rule coco_cb_multimap_reads:
+    """Generate bedgraphs of sample using CoCo correct_bedgraph (cb) and multi-mapped reads"""
+    input:
+        bam_multi = "results/star/{id}/Aligned.sortedByCoord.out.MULTI.bam"
+    output:
+        bedgraph = Path("results/coco_bedgraph_MULTI/", "{id}.bedgraph")
+    threads:
+        32
+    params:
+        coco_path = "git_repos/coco/bin",
+        genome_path = rules.star_index.output.chrNameLength
+    log:
+        "logs/coco/coco_cb_multi_{id}.log"
+    conda:
+        "envs/coco.yaml"
+    shell:
+        "python {params.coco_path}/coco.py cb "
+        "{input.bam_multi} "
+        "{output.bedgraph} "
+        "{params.genome_path} "
+        "--thread {threads} "
+        "&> {log}"
+
+
 
 rule merge_coco_output:
     """ Merge CoCo correct count outputs into one count, cpm or tpm file (all
@@ -293,5 +423,3 @@ rule merge_coco_output:
         "envs/python.yaml"
     script:
         "scripts/merge_coco_cc_output.py"
-
-

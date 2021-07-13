@@ -9,6 +9,8 @@ rule DESeq2_genes:
         samples = "data/design.tsv"
     output:
         results = directory("results/DESeq2/genes"),
+    params:
+        dir = "results/DESeq2/genes"
     log:
         "logs/DESeq2/genes.log"
     conda:

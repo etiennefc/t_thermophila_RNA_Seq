@@ -1,8 +1,10 @@
-# TGIRT-Seq pipeline
+# Tetrahymena tRNA-Seq pipeline using TGIRT
 
 __Author__ : Etienne Fafard-Couture
 
 __Email__ :  _<etienne.fafard-couture@usherbrooke.ca>_
+
+__Description__ : Pipeline used to determine differences in expression of tRNAs bound to MLP1 or in MLP1 KO samples compared to WT samples in <u>T. thermophila</u>.
 
 ## Software to install
 Conda (Miniconda3) needs to be installed (https://docs.conda.io/en/latest/miniconda.html)

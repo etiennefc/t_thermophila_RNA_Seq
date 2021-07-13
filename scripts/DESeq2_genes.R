@@ -7,10 +7,10 @@ library("DESeq2")
 #Loading count matrix from file, converting to integer
 counts <- read.table(
 	snakemake@input[["counts"]], header=TRUE,
-	row.names="gene_id", check.names=FALSE
+	row.names="gene_name", check.names=FALSE  #gene_name instead of gene_id (specific to T.thermophila)
 )
 counts <- as.matrix(counts)
-counts <- subset(counts, select = -c(gene_name))
+counts <- subset(counts, select = -c(gene_id))  # remove gene_id column and keep gene_name (specific to T.thermophila)
 mode(counts) <- "integer"
 print(ncol(counts))
 # Loading samples information from file.
