@@ -11,6 +11,23 @@ import matplotlib.ticker
 
 """Functions to create various graphs"""
 
+def heatmap_fixed(df, cmap, cbar_label, xtick_labels, path, **kwargs):
+    """
+    Creates a clustered heatmap horizontally but not vertically.
+    """
+
+    plt.rcParams['svg.fonttype'] = 'none'
+
+    # Create the heatmap (clustered by rows and columns)
+    graph = sns.clustermap(df, cmap=cmap, xticklabels=True, yticklabels=True, **kwargs)
+    plt.xlabel(xlabel=cbar_label, fontsize=17)
+    graph.ax_heatmap.xaxis.set_ticks_position('top')
+    graph.ax_heatmap.set_xticklabels(xtick_labels)
+    plt.setp(graph.ax_heatmap.xaxis.get_ticklabels(), fontsize=17)
+    plt.setp(graph.ax_heatmap.yaxis.get_ticklabels(), fontsize=9)
+    plt.savefig(path, bbox_inches='tight', dpi=900)
+
+
 def pie_multiple(count_list, labels, colors, ax_title, title, path, **kwargs):
     """
     Create a pie chart for each sample type.

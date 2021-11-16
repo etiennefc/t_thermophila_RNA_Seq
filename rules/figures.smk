@@ -2,6 +2,7 @@ import os
 
 include: "df_formatting.smk"
 include: "bam_extraction.smk"
+include: "fastq_extraction.smk"
 
 rule pie_chart:
     """ Create a pie chart for all average sample of the cumulative abundance
@@ -63,8 +64,37 @@ rule scatter_read_diff:
         #ip_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_IP_vs_WT.svg'),
         #ko_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_KO_vs_WT.svg')
         ip_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_IP_vs_WT_wo_trna.svg'),
-        ko_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_KO_vs_WT_wo_trna.svg')        
+        ko_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_KO_vs_WT_wo_trna.svg')
     conda:
         "../envs/python.yaml"
     script:
         "../scripts/figures/scatter_read_diff.py"
+
+rule heatmap_read_type:
+    """ Create one heatmap per average condition to show the number of reads per
+        read type and tRNA isotype."""
+    input:
+        WT_df = rules.average_normalized_tables.output.WT_df,
+        KO_df = rules.average_normalized_tables.output.KO_df,
+        MLP1_IP_df = rules.average_normalized_tables.output.MLP1_IP_df
+    output:
+        heatmap_wt = os.path.join(config['figure']['heatmap'], 'WT_read_type_per_isotype.svg'),
+        heatmap_ko = os.path.join(config['figure']['heatmap'], 'KO_read_type_per_isotype.svg'),
+        heatmap_ip = os.path.join(config['figure']['heatmap'], 'MLP1_IP_read_type_per_isotype.svg')
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/figures/heatmap_read_type.py"
+
+rule heatmap_read_type_ratio_wt_ip:
+    """ Create one heatmap to show the ratio of number of reads per
+        read type and tRNA isotype between MLP1 IP and WT average samples."""
+    input:
+        WT_df = rules.average_normalized_tables.output.WT_df,
+        MLP1_IP_df = rules.average_normalized_tables.output.MLP1_IP_df
+    output:
+        heatmap = os.path.join(config['figure']['heatmap'], 'read_type_ratio_wt_ip.svg')
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/figures/heatmap_read_type_ratio_wt_ip.py"

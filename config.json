@@ -11,11 +11,16 @@
     "MLP1_IP_2": "MLP1_Iped_elution_2_S8",
     "MLP1_IP_3": "MLP1_Iped_elution_3_S9"
   },
+  "sample_ids": ["KO_1_R1", "KO_1_R2", "KO_2_R1", "KO_2_R2", "KO_3_R1", "KO_3_R2",
+                  "MLP1_IP_1_R1", "MLP1_IP_1_R2", "MLP1_IP_2_R1", "MLP1_IP_2_R2",
+                  "MLP1_IP_3_R1", "MLP1_IP_3_R2", "WT_1_R1", "WT_1_R2", "WT_2_R1",
+                  "WT_2_R2","WT_3_R1", "WT_3_R2"],
   "path":
   {
     "fastq": "data/references/fastq/",
     "reference_genome": "data/references/t_thermophila_genome.fa",
     "coco_git_link": "http://gitlabscottgroup.med.usherbrooke.ca/scott-group/coco.git",
+    "agrep_git_link": "https://github.com/Wikinaut/agrep.git",
     "genome_gff": "data/references/genome.gff",
     "tRNA_gff": "data/references/tRNA.gff",
     "rRNA_5s_gff": "data/references/5s_rRNA.gff",
@@ -37,13 +42,17 @@
     "merged_reads_df": "results/extract_reads/merged_df.tsv",
     "merged_reads_wo_trna_df": "results/extract_reads_wo_trna_seq/merged_df.tsv",
     "mature_premature_diff": "results/extract_reads/mature_vs_premature.tsv",
-    "mature_premature_diff_wo_trna": "results/extract_reads_wo_trna_seq/mature_vs_premature.tsv"
+    "mature_premature_diff_wo_trna": "results/extract_reads_wo_trna_seq/mature_vs_premature.tsv",
+    "tRNA_unique_sequences": "data/references/tRNA_unique_sequences.csv",
+    "extract_fastq_reads": "results/extract_fastq_reads/",
+    "extract_read_type": "results/extract_read_type/"
   },
   "figure":
   {
     "pie": "results/figures/pie/",
     "volcano": "results/figures/volcano/",
-    "scatter": "results/figures/scatter/"
+    "scatter": "results/figures/scatter/",
+    "heatmap": "results/figures/heatmap/"
   },
   "colors":
   {

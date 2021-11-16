@@ -94,5 +94,15 @@
         "time": "0-2:30:00",
         "mail-user": "etienne.fafard-couture@usherbrooke.ca",
         "mail-type": "FAIL"
+    },
+    "extract_fastq_reads":
+    {
+        "job-name": "extract_fastq_reads",
+        "nodes": "1",
+        "cpus-per-task": "1",
+        "mem": "2G",
+        "time": "0-4:30:00",
+        "mail-user": "etienne.fafard-couture@usherbrooke.ca",
+        "mail-type": "FAIL"
     }
 }

@@ -12,27 +12,32 @@ include: "rules/DESeq2.smk"
 include: "rules/df_formatting.smk"
 include: "rules/figures.smk"
 include: "rules/bam_extraction.smk"
+include: "rules/fastq_extraction.smk"
 
 rule all:
     input:
         qc_before_trim = expand("logs/fastqc/before_trim/{id}.log",
             id=simple_id),
-        qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
-        coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
-	bedgraph = expand("results/coco_bedgraph/{id}.bedgraph", id=simple_id),
-	stringent_bedgraph = expand("results/coco_bedgraph_stringent/{id}.bedgraph", id=simple_id),  # bedgraph no mismatch allowed
-        unique_bedgraph = expand("results/coco_bedgraph_UNIQUE/{id}.bedgraph", id=simple_id),  # bedgraph for uniquely mapped reads
-        multi_bedgraph = expand("results/coco_bedgraph_MULTI/{id}.bedgraph", id=simple_id),  # bedgraph for multi-mapped reads
-        gtf_corrected = config['path']['corrected_gtf'],  # via coco_ca
-	deseq_log = "logs/DESeq2/genes.log",
-        tpm_df_biotype = config['path']['tpm_df_biotype'],
-        WT_vs_KO_clean = os.path.join(config['path']['deseq_output'],
-                        'partial_knockout-wild_type_v2.csv'),
-        modified_fasta = config['path']['tRNA_sequences_id'],
-        number_reads = expand(os.path.join(config['path']['extract_reads'], "{id}.txt"), id=simple_id),
-        merged_reads_df = config['path']['merged_reads_df'],
-        avg_diff_df = config['path']['mature_premature_diff'],
-        avg_diff_wo_trna_df = config['path']['mature_premature_diff_wo_trna'],
+        fasta = expand(os.path.join(config['path']['extract_fastq_reads'], '{sample_ids}/'), sample_ids=config['sample_ids']),
+        empty_log = expand('logs/{sample_ids}_merge_isotypes_per_sample.log', sample_ids=config['sample_ids']),
+        empty_log2 = expand('logs/{sample_ids}_normalize_read_tables.log', sample_ids=config['sample_ids']),
+        WT_df = os.path.join(config['path']['extract_read_type'], 'WT_avg_normalized_df.tsv'),
+        #qc_after_trim = expand("logs/fastqc/after_trim/{id}.log", id=simple_id),
+        #coco_cc = expand('results/coco/{id}.tsv', id=simple_id),
+        #bedgraph = expand("results/coco_bedgraph/{id}.bedgraph", id=simple_id),
+        #stringent_bedgraph = expand("results/coco_bedgraph_stringent/{id}.bedgraph", id=simple_id),  # bedgraph no mismatch allowed
+        #unique_bedgraph = expand("results/coco_bedgraph_UNIQUE/{id}.bedgraph", id=simple_id),  # bedgraph for uniquely mapped reads
+        #multi_bedgraph = expand("results/coco_bedgraph_MULTI/{id}.bedgraph", id=simple_id),  # bedgraph for multi-mapped reads
+        #gtf_corrected = config['path']['corrected_gtf'],  # via coco_ca
+        #deseq_log = "logs/DESeq2/genes.log",
+        #tpm_df_biotype = config['path']['tpm_df_biotype'],
+        #WT_vs_KO_clean = os.path.join(config['path']['deseq_output'],
+        #                'partial_knockout-wild_type_v2.csv'),
+        #modified_fasta = config['path']['tRNA_sequences_id'],
+        #number_reads = expand(os.path.join(config['path']['extract_reads'], "{id}.txt"), id=simple_id),
+        #merged_reads_df = config['path']['merged_reads_df'],
+        #avg_diff_df = config['path']['mature_premature_diff'],
+        #avg_diff_wo_trna_df = config['path']['mature_premature_diff_wo_trna'],
         figures = get_figures_path(config)
 
 
@@ -44,7 +49,8 @@ rule all_downloads:
 #        genome_gff = config['path']['genome_gff'],
 #        tRNA_gff = config['path']['tRNA_gff'],
 #        rRNA_5s_gff = config['path']['rRNA_5s_gff'],
-        coco_git = 'git_repos/coco'
+        coco_git = 'git_repos/coco',
+        git_agrep_folder = 'git_repos/agrep'
 
 
 
