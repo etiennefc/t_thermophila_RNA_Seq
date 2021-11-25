@@ -34,3 +34,5 @@ ip_avg = ip_avg.filter(like='_norm', axis=1).reset_index()
 wt_avg.to_csv(snakemake.output.WT_df, index=False, sep='\t')
 ko_avg.to_csv(snakemake.output.KO_df, index=False, sep='\t')
 ip_avg.to_csv(snakemake.output.MLP1_IP_df, index=False, sep='\t')
+
+

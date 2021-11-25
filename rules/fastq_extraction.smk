@@ -21,10 +21,10 @@ rule extract_read_type:
         premature ending with T{1,10}) for each tRNA isotype_anticodon and per
         condition."""
     input:
-        fasta_dir = os.path.join(config['path']['extract_fastq_reads'], '{sample_ids}/'),
+        fasta_dir = rules.extract_fastq_reads.output.fasta_dir,
         tRNA_sequences = config['path']['tRNA_unique_sequences']
     output:
-        read_type_dir = directory(os.path.join(config['path']['extract_read_type'], '{sample_ids}/'))
+        read_type_dir = directory(os.path.join(config['path']['extract_read_type'], '{sample_ids}/')),
     conda:
         "../envs/python_regex.yaml"
     script:
@@ -36,9 +36,7 @@ rule merge_isotypes_per_sample:
     input:
         read_type_dir = rules.extract_read_type.output.read_type_dir
     output:
-        empty_log = 'logs/{sample_ids}_merge_isotypes_per_sample.log'
-    params:
-        read_type_df = 'results/extract_read_type/{sample_ids}/merged_isotypes.tsv'
+        read_type_df = 'results/merge_isotypes_per_sample/{sample_ids}/merged_isotypes.tsv',
     conda:
         "../envs/python.yaml"
     script:
@@ -49,11 +47,9 @@ rule normalize_read_tables:
         total number of reads associated to that isotype_anticodon. Return a
         normalized table per sample."""
     input:
-        read_type_df = 'results/extract_read_type/{sample_ids}/merged_isotypes.tsv'
+        read_type_df = rules.merge_isotypes_per_sample.output.read_type_df        
     output:
-        empty_log = 'logs/{sample_ids}_normalize_read_tables.log'
-    params:
-        normalized_df = 'results/extract_read_type/{sample_ids}/merged_isotypes_normalized.tsv'
+        normalized_df = 'results/normalize_read_tables/{sample_ids}/merged_isotypes_normalized.tsv'	
     conda:
         "../envs/python.yaml"
     script:
@@ -62,8 +58,8 @@ rule normalize_read_tables:
 rule average_normalized_tables:
     """  Create an average normalized table per condition (WT, KO and MLP1 IP)."""
     input:
-        normalized_dfs = expand('results/extract_read_type/{sample_ids}/merged_isotypes_normalized.tsv', sample_ids=config['sample_ids'])
-    output:
+        normalized_dfs = expand(rules.normalize_read_tables.output.normalized_df, sample_ids=config['sample_ids']),
+    output: 
         WT_df = os.path.join(config['path']['extract_read_type'], 'WT_avg_normalized_df.tsv'),
         KO_df = os.path.join(config['path']['extract_read_type'], 'KO_avg_normalized_df.tsv'),
         MLP1_IP_df = os.path.join(config['path']['extract_read_type'], 'MLP1_IP_avg_normalized_df.tsv')

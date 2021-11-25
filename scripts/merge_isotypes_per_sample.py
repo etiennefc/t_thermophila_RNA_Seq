@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 import os
 import pandas as pd
-import subprocess as sp
 
 input_dir = snakemake.input.read_type_dir
-output_df = snakemake.params.read_type_df
+output_df = snakemake.output.read_type_df
 col_list = ['mature_CCA', 'premature_1T', 'premature_2T', 'premature_3T',
             'premature_4T', 'premature_5T', 'premature_6T', 'premature_7T',
             'premature_8T', 'premature_9T', 'premature_10T', 'other_reads']
-empty_log = snakemake.output.empty_log
 
 # Add column names to df (see col_list)
 dfs = []
@@ -29,5 +27,3 @@ final_df = final_df.sort_values(by=['isotype_anticodon'])
 final_df.to_csv(output_df, index=False, sep='\t')
 
 
-# Create empty log so that the rule fake output is created
-sp.call(f'touch {empty_log}', shell=True)
