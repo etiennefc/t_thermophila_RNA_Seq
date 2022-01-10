@@ -16,15 +16,18 @@ rule download_annotation:
     output:
         genome_gff = config['path']['genome_gff'],
         tRNA_gff = config['path']['tRNA_gff'],
-        rRNA_5s_gff = config['path']['rRNA_5s_gff']
+        rRNA_5s_gff = config['path']['rRNA_5s_gff'],
+        tRNA_unique_sequences = config['path']['tRNA_unique_sequences']
     params:
         link_genome_gff = config['download']['genome_gff'],
         link_tRNA_gff = config['download']['tRNA_gff'],
-        link_5s_gff = config['download']['rRNA_5s_gff']
+        link_5s_gff = config['download']['rRNA_5s_gff'],
+        link_tRNA_unique_sequences = config['download']['tRNA_unique_sequences']
     shell:
         "wget --quiet -O {output.genome_gff} {params.link_genome_gff} && "
         "wget --quiet -O {output.tRNA_gff} {params.link_tRNA_gff} && "
-        "wget --quiet -O {output.rRNA_5s_gff} {params.link_5s_gff}"
+        "wget --quiet -O {output.rRNA_5s_gff} {params.link_5s_gff} && "
+        "wget --quiet -O {output.tRNA_unique_sequences} {params.link_tRNA_unique_sequences}"
 
 rule download_coco_git:
     """Download git repository of CoCo."""
@@ -50,4 +53,4 @@ rule download_agrep:
     shell:
         'mkdir -p {output.git_agrep_folder} && '
         'git clone {params.git_agrep_link} {output.git_agrep_folder} && '
-        'cd git_repos/agrep && make'    
+        'cd git_repos/agrep && make'

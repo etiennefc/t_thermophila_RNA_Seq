@@ -21,9 +21,9 @@
     "reference_genome": "data/references/t_thermophila_genome.fa",
     "coco_git_link": "http://gitlabscottgroup.med.usherbrooke.ca/scott-group/coco.git",
     "agrep_git_link": "https://github.com/Wikinaut/agrep.git",
-    "genome_gff": "data/references/genome.gff",
-    "tRNA_gff": "data/references/tRNA.gff",
-    "rRNA_5s_gff": "data/references/5s_rRNA.gff",
+    "genome_gff": "data/references/genome.gff3",
+    "tRNA_gff": "data/references/tRNA.gff3",
+    "rRNA_5s_gff": "data/references/5s_rRNA.gff3",
     "genome_gtf": "data/references/genome.gtf",
     "tRNA_gtf": "data/references/tRNA.gtf",
     "5s_rRNA_gtf": "data/references/5s_rRNA.gtf",
@@ -77,6 +77,7 @@
     "genome": "http://www.ciliate.org/system/downloads/1-upd-Genome-assembly.fasta",
     "genome_gff": "TO_UPDATE",
     "tRNA_gff": "TO_UPDATE",
-    "rRNA_5s_gff": "TO_UPDATE"
+    "rRNA_5s_gff": "TO_UPDATE",
+    "tRNA_unique_sequences": "TO_UPDATE"
   }
 }
