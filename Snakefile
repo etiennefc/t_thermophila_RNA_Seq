@@ -239,7 +239,7 @@ rule coco_cc:
         per million (TPM) for each gene using CoCo correct_count (cc)."""
     input:
         gtf = rules.coco_ca.output.gtf_corrected,
-        bam = rules.star_align.output.bam
+        bam = rules.star_align_stringent.output.bam
     output:
         counts = Path("results/coco/", "{id}.tsv")
     threads:

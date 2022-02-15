@@ -1,7 +1,6 @@
 import os
 
 include: "df_formatting.smk"
-include: "bam_extraction.smk"
 include: "fastq_extraction.smk"
 
 rule pie_chart:
@@ -55,20 +54,6 @@ rule scatter_fold_change:
     script:
         "../scripts/figures/scatter_fold_change.py"
 
-rule scatter_read_diff:
-    """ Create a scatter plot of the difference of number of premature vs mature
-        tRNA reads by comparing either IP vs WT or KO vs WT read differences."""
-    input:
-        df = rules.mature_premature_diff.output.avg_diff_df
-    output:
-        #ip_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_IP_vs_WT.svg'),
-        #ko_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_KO_vs_WT.svg')
-        ip_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_IP_vs_WT_wo_trna.svg'),
-        ko_vs_wt = os.path.join(config['figure']['scatter'], 'read_diff_KO_vs_WT_wo_trna.svg')
-    conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/figures/scatter_read_diff.py"
 
 rule heatmap_read_type:
     """ Create one heatmap per average condition to show the number of reads per

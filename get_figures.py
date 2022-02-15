@@ -4,12 +4,6 @@ import os
 def get_figures_path(config):
     """Return list of figures (and their path) to generate from config"""
     files = []
-    files.append(os.path.join(config['figure']['volcano'], 'KO_vs_WT.svg'))
-    files.append(os.path.join(config['figure']['volcano'], 'MLP1_IP_vs_WT.svg'))
-    files.append(os.path.join(config['figure']['volcano'], 'KO_vs_WT_tpm.svg'))
-    files.append(os.path.join(config['figure']['volcano'], 'MLP1_IP_vs_WT_tpm.svg'))
-    files.append(os.path.join(config['figure']['pie'], 'average_TPM_per_sample.svg'))
-    files.append(os.path.join(config['figure']['scatter'], 'log2FC_KO_vs_IP.svg'))
     files.append(os.path.join(config['figure']['heatmap'], 'WT_read_type_per_isotype.svg'))
     files.append(os.path.join(config['figure']['heatmap'], 'KO_read_type_per_isotype.svg'))
     files.append(os.path.join(config['figure']['heatmap'], 'MLP1_IP_read_type_per_isotype.svg'))
