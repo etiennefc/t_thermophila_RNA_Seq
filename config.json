@@ -19,7 +19,7 @@
   {
     "fastq": "data/references/fastq/",
     "reference_genome": "data/references/t_thermophila_genome.fa",
-    "coco_git_link": "http://gitlabscottgroup.med.usherbrooke.ca/scott-group/coco.git",
+    "coco_git_link": "https://github.com/scottgroup/coco.git",
     "agrep_git_link": "https://github.com/Wikinaut/agrep.git",
     "genome_gff": "data/references/genome.gff3",
     "tRNA_gff": "data/references/tRNA.gff3",
