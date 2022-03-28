@@ -75,9 +75,9 @@
   "download":
   {
     "genome": "http://www.ciliate.org/system/downloads/1-upd-Genome-assembly.fasta",
-    "genome_gff": "TO_UPDATE",
-    "tRNA_gff": "TO_UPDATE",
-    "rRNA_5s_gff": "TO_UPDATE",
-    "tRNA_unique_sequences": "TO_UPDATE"
+    "genome_gff": "https://zenodo.org/record/6391187/files/genome.gff3",
+    "tRNA_gff": "https://zenodo.org/record/6391187/files/tRNA.gff3",
+    "rRNA_5s_gff": "https://zenodo.org/record/6391187/files/5s_rRNA.gff3",
+    "tRNA_unique_sequences": "https://zenodo.org/record/6391187/files/tRNA_unique_sequences.csv"
   }
 }
